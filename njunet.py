@@ -76,19 +76,23 @@ def getInfo():
     print(f"余额：{balance/100:.2f} 元，已使用：{hour} 小时 {minute} 分钟, "
           f"本月已消费 {consumed/100:.2f} 元。")
 
-    topTimeLeft = 130 * 3600 - timeCost # 130 hours max per month
-    if topTimeLeft > 0:
-        moneyToGo = topTimeLeft / PRICE # 1 cent for 6 mintes.
-        if balance <= moneyToGo:
-            h, m, _ = formatTime(balance * PRICE)
-            if hour < 30:
-                h += 30 - hour
-            print(f"余额不足本月封顶，还可使用 {h:.0f} 小时 {m:.0f} 分钟。")
-        else:
-            h, m, _ = formatTime(topTimeLeft)
-            print(f"余额充足，距离封顶还有 {h}小时 {m}分钟。")
+    if timeCost < 30 * 3600:
+        topTimeLeft = 100 * 3600  # 100 hours
+    elif timeCost < 130 * 3600:
+        topTimeLeft = 130 * 3600 - timeCost  # 130 hours max per month
     else:
         print("本月费用已封顶 20 元.")
+        return
+    moneyToGo = topTimeLeft / PRICE  # 1 cent for 6 mintes.
+    if balance <= moneyToGo:  # balance not enough
+        remainTime = balance * PRICE
+        if timeCost < 30 * 3600:
+            remainTime += 30 * 3600 - timeCost
+        h, m, _ = formatTime(remainTime)
+        print(f"余额不足本月封顶，还可使用 {h:.0f} 小时 {m:.0f} 分钟。")
+    else:
+        h, m, _ = formatTime(130 * 3600 - timeCost)
+        print(f"余额充足，距离封顶还有 {h}小时 {m}分钟。")
 
 
 def checkInternet():
@@ -114,7 +118,7 @@ def login():
         print(f"账户名: {username}")
     if password == "****" or password == "":
         import getpass
-        password = getpass.getpass()
+        password = getpass.getpass("密码：")
 
     param = {
         "username": username,
@@ -152,7 +156,7 @@ def logout():
 def main():
     if len(sys.argv) == 1:
         print(f"usage:\n    登陆: 'python njunet.py login'"
-              f"\nor  登出: 'python njunet.py logout' to logout")
+              f"\n    登出: 'python njunet.py logout'")
         sys.exit()
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=["login", "logout"],

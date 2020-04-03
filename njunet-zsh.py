@@ -161,12 +161,12 @@ def login(userCheck: str = None):
     if cont == 200:
         time.sleep(1)  # wait before login finishes, or may fail to get info.
         if checkInternet():
-            print("登陆校园网成功")
+            print("\033[0;32;1m登陆校园网成功\033[0m")
             printInfo()
         else:
-            print("登陆校园网失败")
+            print("\033[0;31;1m登陆校园网失败\033[0m")
     else:
-        print("登陆校园网失败")
+        print("\033[0;31;1m登陆校园网失败\033[0m")
 
 
 def checkProcess():
@@ -200,7 +200,7 @@ def logout(userCheck: str = None):
         for _ in range(3):
             requests.post(url)  # send logout
             if not checkInternet():
-                print(f"已退出登陆校园网 "
+                print(f"\033[0;32;1m已退出登陆校园网\033[0m "
                       f"账户：{name} {userid}")
                 return
             time.sleep(0.5)
@@ -216,7 +216,7 @@ def logout(userCheck: str = None):
     global username
     if not userCheck:
         if username == "xxxx" or username == "":
-            print(f"Notice: 已登陆账户为 {name} {userid}")
+            print(f"\033[0;31;1mNotice\033[0m: 已登陆账户为 {name} {userid}")
             cmd = input("是否退出这个账户？(y/[n])")
             if cmd == 'y':
                 return sendLogout()
@@ -224,9 +224,8 @@ def logout(userCheck: str = None):
                 sys.exit()
         else:
             userCheck = username
-
     if userCheck and userCheck != userid:
-        print(f"Notice: 已登陆账户为 {name} {userid} ，与您设置的账户"
+        print(f"\033[1;31;1mNotice\033[0m: 已登陆账户为 {name} {userid} ，与您设置的账户"
               f" {userCheck} 不一致")
         cmd = input("是否退出这个账户？(y/[n])")
         if cmd == 'y':

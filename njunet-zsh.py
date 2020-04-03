@@ -174,9 +174,10 @@ def checkProcess():
     ignoringCmd = set(["ssh", "sshd:", "vim", "emacs", "ps"])
     ignoringSess = re.compile(r"zsh|/sftp|/bin/bash|python")
     loginName = getpass.getuser()  # the login name of the user of the shell
-    ps = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE).communicate()[0]
+    ps = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)\
+                   .communicate()[0]
     processes = ps.decode("utf8").strip().split('\n')
-    nfields = len(processes[0].split()) - 1
+    nfields = len(processes[0].split()) - 1  # column numbers - 1
     from collections import Counter
     recDict = Counter()
     for row in processes[1:]:
@@ -195,7 +196,13 @@ def checkProcess():
 
 
 def logout(userCheck: str = None):
-    def sendLogout():
+    def doLogout():
+        print("正在退出登陆南京大学校园网...")
+        if checkProcess():
+            cmd = input("\n有以上进程在运行，是否继续退出登陆校园网？(y/[n])")
+            if cmd != "y":
+                return None  # don't logout
+        # logout
         url = "http://p.nju.edu.cn/portal_io/logout"
         for _ in range(3):
             requests.post(url)  # send logout
@@ -213,33 +220,27 @@ def logout(userCheck: str = None):
         sys.exit()
     userid = userinfo["username"]
     name = userinfo["fullname"]
-    global username
-    if not userCheck:
-        if username == "xxxx" or username == "":
-            print(f"\033[0;31;1mNotice\033[0m: 已登陆账户为 {name} {userid}")
-            cmd = input("是否退出这个账户？(y/[n])")
-            if cmd == 'y':
-                return sendLogout()
-            else:
-                sys.exit()
+    if userCheck:
+        if userCheck == userid:
+            # log out if userCheck is set and the login id is right
+            return doLogout()
         else:
-            userCheck = username
-    if userCheck and userCheck != userid:
-        print(f"\033[1;31;1mNotice\033[0m: 已登陆账户为 {name} {userid} ，与您设置的账户"
-              f" {userCheck} 不一致")
+            # ask nothing
+            return
+
+    global username
+    if username == "xxxx" or username == "":
+        print(f"\033[0;31;1mNotice\033[0m: 已登陆账户为 {name} {userid}")
         cmd = input("是否退出这个账户？(y/[n])")
         if cmd == 'y':
-            sendLogout()
-        else:
-            sys.exit()
-
-    print("正在退出登陆南京大学校园网...")
-    if checkProcess():
-        cmd = input("\n有以上进程在运行，是否继续退出登陆校园网？(y/[n])")
-        if cmd == "y":
-            sendLogout()
+            return doLogout()  # else do nothing
     else:
-        sendLogout()
+        if username != userid:
+            print(f"\033[1;31;1mNotice\033[0m: 已登陆账户为 {name} {userid} ，与您设置的账户"
+                  f" {username} 不一致")
+            cmd = input("是否退出这个账户？(y/[n])")
+            if cmd == 'y':
+                return doLogout()  # else do nothing
 
 
 def main():

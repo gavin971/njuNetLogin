@@ -8,6 +8,7 @@
 避免每次都要输入。
 
 Author: Pavinberg
+Email: pavin0702@gmail.com
 Repository: https://github.com/Pavinberg/njuNetLogin
 
 '''
@@ -144,7 +145,7 @@ def login(userCheck: str = None):
                 password = "****"  # reset password
             else:
                 sys.exit()
-            print(f"账户名: {username}")
+        print(f"账户名: {username}")
     if password == "****" or password == "":
         password = getpass.getpass("密码：")
 
@@ -241,6 +242,8 @@ def logout(userCheck: str = None):
             cmd = input("是否退出这个账户？(y/[n])")
             if cmd == 'y':
                 return doLogout()  # else do nothing
+        else:
+            return doLogout()
 
 
 def main():

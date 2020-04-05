@@ -86,7 +86,8 @@ def printInfo():
 
     timeinfo = getTimeInfo()
     if not timeinfo:
-        print("Error: 网络错误，可能由于不在校园网环境下")
+        print(f"Error: 网络异常，可能是校园网状况不稳定。"
+              f"不能确定是否登陆成功，请重试或用浏览器查看情况")
         sys.exit()
     totTime = timeinfo["total_time"]  # seconds
 
@@ -109,7 +110,7 @@ def printInfo():
             h, m, _ = formatTime(remainTime)
             print(f"余额不足本月封顶，还可使用 {h:.0f} 小时 {m:.0f} 分钟。")
         else:
-            h, m, _ = formatTime(timeLeft)
+            h, m, _ = formatTime(TOPTIME - totTime)
             print(f"余额充足，距离封顶还有 {h}小时 {m}分钟。")
 
 
